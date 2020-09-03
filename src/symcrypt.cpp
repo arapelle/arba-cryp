@@ -6,7 +6,7 @@
 
 namespace cryp
 {
-symcrypt::symcrypt(const Key& key)
+symcrypt::symcrypt(const crypto_key& key)
     : key_(key)
 {}
 

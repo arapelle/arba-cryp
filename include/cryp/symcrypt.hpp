@@ -10,7 +10,7 @@ class symcrypt
 {
 public:
     inline constexpr static uint8_t min_data_size = sizeof(core::uuid);
-    using Key = std::array<uint8_t, min_data_size>;
+    using crypto_key = std::array<uint8_t, min_data_size>;
 
 private:
     inline constexpr static uint8_t min_data_size_1 = min_data_size + 1;
@@ -18,15 +18,15 @@ private:
     using Offsets = std::array<uint8_t, 8>;
 
 public:
-    explicit symcrypt(const Key& key);
+    explicit symcrypt(const crypto_key& key);
     explicit symcrypt(const core::uuid& uuid);
 
     void encrypt(std::vector<uint8_t>& bytes);
     void decrypt(std::vector<uint8_t>& bytes);
 
-    inline const Key& key() const { return key_; }
-    inline void set_key(const Key& key) { key_ = key; }
-    inline void set_key(const core::uuid& key) { set_key(Key(key.data())); }
+    inline const crypto_key& key() const { return key_; }
+    inline void set_key(const crypto_key& key) { key_ = key; }
+    inline void set_key(const core::uuid& key) { set_key(crypto_key(key.data())); }
 
 private:
     // add/remove data size
@@ -74,6 +74,6 @@ private:
     std::array<uint8_t, 8> uint64_to_array8(uint64_t integer);
 
 private:
-    Key key_;
+    crypto_key key_;
 };
 }

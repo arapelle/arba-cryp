@@ -42,8 +42,8 @@ void display_data(const range_type& data)
 
 TEST(cryp_tests, test_construct_key)
 {
-    cryp::symcrypt::Key key{ 16, 216, 58, 6, 182, 126, 102, 212, 190, 60, 177, 6, 172, 106, 62, 46 };
-    cryp::symcrypt::Key expected_key = key;
+    cryp::symcrypt::crypto_key key{ 16, 216, 58, 6, 182, 126, 102, 212, 190, 60, 177, 6, 172, 106, 62, 46 };
+    cryp::symcrypt::crypto_key expected_key = key;
     cryp::symcrypt symcrypt(key);
     ASSERT_EQ(symcrypt.key(), expected_key);
 }
@@ -57,9 +57,9 @@ TEST(cryp_tests, test_construct_uuid)
 
 TEST(cryp_tests, test_set_key_key)
 {
-    cryp::symcrypt::Key key{ 16, 216, 58, 6, 182, 126, 102, 212, 190, 60, 177, 6, 172, 106, 62, 46 };
+    cryp::symcrypt::crypto_key key{ 16, 216, 58, 6, 182, 126, 102, 212, 190, 60, 177, 6, 172, 106, 62, 46 };
     cryp::symcrypt symcrypt(key);
-    cryp::symcrypt::Key new_key{ 254, 241, 196, 48, 101, 5, 236, 98, 32, 182, 176, 74, 60, 188, 4, 102 };
+    cryp::symcrypt::crypto_key new_key{ 254, 241, 196, 48, 101, 5, 236, 98, 32, 182, 176, 74, 60, 188, 4, 102 };
     ASSERT_NE(symcrypt.key(), new_key);
     symcrypt.set_key(new_key);
     ASSERT_EQ(symcrypt.key(), new_key);
