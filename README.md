@@ -2,7 +2,7 @@
 
 The purpose is to provide simple cryptographic algorithms in C++.
 
-See [task board](https://app.gitkraken.com/glo/board/X1D8kT2bBQARup16) for future updates and features.
+See [task board](https://app.gitkraken.com/glo/board/X1D-wj2bBQARup8C) for future updates and features.
 
 # Install
 
