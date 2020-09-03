@@ -1,5 +1,5 @@
 #include <core/uuid.hpp>
-#include <cryp/symcryp.hpp>
+#include <cryp/symcrypt.hpp>
 #include <gtest/gtest.h>
 #include <ranges>
 #include <cstdlib>

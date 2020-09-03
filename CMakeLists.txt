@@ -16,8 +16,8 @@ set_build_type_if_undefined()
 
 project(cryp
         VERSION 0.1.0
-#        DESCRIPTION ""
-#        HOMEPAGE_URL ""
+        DESCRIPTION "Small cryptographic library."
+        HOMEPAGE_URL "https://github.com/arapelle/cryp"
         LANGUAGES CXX)
 
 message(STATUS "BUILD   : ${CMAKE_BUILD_TYPE}")
@@ -32,12 +32,12 @@ library_build_options(${PROJECT_NAME} STATIC SHARED EXAMPLE TEST)
 
 # Headers:
 set(headers
-include/cryp/symcryp.hpp
+include/cryp/symcrypt.hpp
 )
 
 # Sources:
 set(sources
-src/symcryp.cpp
+src/symcrypt.cpp
 )
 
 # Add C++ library
@@ -65,11 +65,12 @@ endforeach()
 install_cpp_library_targets(${PROJECT_NAME}
                             TARGETS ${project_targets}
                             INCLUDE_DIRECTORIES "include/${PROJECT_NAME}"
+                            NAMESPACE ${PROJECT_NAME}::
                             )
 
 # Install package
 install_package(${PROJECT_NAME}
-                VERBOSE_PACKAGE_CONFIG_FILE
+                INPUT_PACKAGE_CONFIG_FILE ${PROJECT_NAME}-config.cmake.in
                 EXPORT_NAMES ${PROJECT_NAME})
 
 if(${PROJECT_NAME}_BUILD_EXAMPLES)

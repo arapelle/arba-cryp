@@ -1,4 +1,4 @@
-#include <cryp/symcryp.hpp>
+#include <cryp/symcrypt.hpp>
 #include <iostream>
 
 template <std::ranges::input_range range_type>

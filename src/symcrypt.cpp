@@ -1,4 +1,4 @@
-#include <cryp/symcryp.hpp>
+#include <cryp/symcrypt.hpp>
 #include <core/hash.hpp>
 #include <span>
 #include <bit>

@@ -1,3 +1,3 @@
 add_cpp_library_tests(SHARED ${PROJECT_NAME}
                       STATIC ${PROJECT_NAME}-static
-                      SOURCES symcryp_tests.cpp)
+                      SOURCES symcrypt_tests.cpp)
