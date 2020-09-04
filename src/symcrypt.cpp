@@ -76,7 +76,7 @@ void symcrypt::decrypt_bytes_(std::vector<uint8_t>& bytes)
 // encrypt/decrypt offsets
 void symcrypt::encrypt_and_stores_offsets_(std::vector<uint8_t>& bytes, const Offsets& offsets)
 {
-    uint64_t key_hash = core::murmur_hash_64(key_.data(), min_data_size);
+    uint64_t key_hash = core::neutral_murmur_hash_64(key_.data(), min_data_size);
     std::array key_hash_bytes = uint64_to_array8(key_hash);
 
     bytes.reserve(bytes.size() + offsets.size());
@@ -89,7 +89,7 @@ void symcrypt::encrypt_and_stores_offsets_(std::vector<uint8_t>& bytes, const Of
 
 void symcrypt::decrypt_and_retrieves_offsets_(std::vector<uint8_t>& bytes, Offsets& offsets)
 {
-    uint64_t key_hash = core::murmur_hash_64(key_.data(), min_data_size);
+    uint64_t key_hash = core::neutral_murmur_hash_64(key_.data(), min_data_size);
     std::array key_hash_bytes = uint64_to_array8(key_hash);
     std::span offsets_span(&*(bytes.end() - offsets.size()), offsets.size());
 
