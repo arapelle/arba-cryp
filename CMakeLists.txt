@@ -15,7 +15,7 @@ set_build_type_if_undefined()
 # C++ PROJECT
 
 project(cryp
-        VERSION 0.1.0
+        VERSION 0.2.0
         DESCRIPTION "Small cryptographic library."
         HOMEPAGE_URL "https://github.com/arapelle/cryp"
         LANGUAGES CXX)
