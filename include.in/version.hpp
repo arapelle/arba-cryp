@@ -1,0 +1,11 @@
+#pragma once
+
+#define CRYP_VERSION_MAJOR @PROJECT_VERSION_MAJOR@
+#define CRYP_VERSION_MINOR @PROJECT_VERSION_MINOR@
+#define CRYP_VERSION_PATCH @PROJECT_VERSION_PATCH@
+#define CRYP_VERSION @PROJECT_VERSION@
+
+namespace cryp
+{
+inline constexpr bool has_tbb = @TBB_FOUND@;
+}

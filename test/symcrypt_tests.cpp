@@ -1,4 +1,5 @@
 #include <core/uuid.hpp>
+#include <core/hash.hpp>
 #include <cryp/symcrypt.hpp>
 #include <gtest/gtest.h>
 #include <ranges>
@@ -55,6 +56,13 @@ TEST(cryp_tests, test_construct_uuid)
     ASSERT_EQ(symcrypt.key(), key.data());
 }
 
+TEST(cryp_tests, test_construct_string_view)
+{
+    std::string_view key("my password 01A%^o");
+    cryp::symcrypt symcrypt(key);
+    ASSERT_EQ(symcrypt.key(), core::neutral_murmur_hash_array_16(key.data(), key.length()));
+}
+
 TEST(cryp_tests, test_set_key_key)
 {
     cryp::symcrypt::crypto_key key{ 16, 216, 58, 6, 182, 126, 102, 212, 190, 60, 177, 6, 172, 106, 62, 46 };
@@ -74,6 +82,17 @@ TEST(cryp_tests, test_set_key_uuid)
     ASSERT_NE(symcrypt.key(), new_key.data());
     symcrypt.set_key(new_key);
     ASSERT_EQ(symcrypt.key(), new_key.data());
+}
+
+TEST(cryp_tests, test_set_key_string_view)
+{
+    std::string_view key("my password 01A%^o");
+    cryp::symcrypt symcrypt(key);
+    ASSERT_EQ(symcrypt.key(), core::neutral_murmur_hash_array_16(key.data(), key.length()));
+    std::string_view new_key("8defc670-716b-4242-9932-3009bf3e6ecc");
+    ASSERT_NE(symcrypt.key(), core::neutral_murmur_hash_array_16(new_key.data(), new_key.length()));
+    symcrypt.set_key(new_key);
+    ASSERT_EQ(symcrypt.key(), core::neutral_murmur_hash_array_16(new_key.data(), new_key.length()));
 }
 
 TEST(cryp_tests, test_long_data)
@@ -160,7 +179,6 @@ TEST(cryp_tests, test_zero_data)
     std::vector<uint8_t> aux_data = data;
     display_data(data);
     ASSERT_NE(data, init_data);
-    ASSERT_NE(data[0], data[1]);
     symcrypt.decrypt(data);
     display_data(data);
     ASSERT_EQ(data, init_data);
@@ -193,6 +211,23 @@ TEST(cryp_tests, test_seq_data)
     symcrypt.decrypt(data);
     display_data(data);
     ASSERT_EQ(data, init_data);
+}
+
+TEST(cryp_tests, test_diversity)
+{
+    std::vector<uint8_t> data;
+    data.reserve(256 + 9);
+    data.resize(256, 0);
+    cryp::symcrypt symcrypt(core::uuid("2689d9bd-9626-4023-8842-d244d48fe3bb"));
+    symcrypt.encrypt(data);
+    ASSERT_EQ(data.capacity(), data.size());
+
+    std::vector<std::size_t> byte_counters(256, 0);
+    for (uint8_t byte : data)
+        ++(byte_counters[byte]);
+    auto counter_is_positive = [](const std::size_t& counter){ return counter > 0; };
+    std::size_t number_of_positive_counters = std::ranges::count_if(byte_counters, counter_is_positive);
+    ASSERT_GT(number_of_positive_counters, byte_counters.size()/2);
 }
 
 int main(int argc, char** argv)

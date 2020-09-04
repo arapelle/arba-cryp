@@ -1,11 +1,28 @@
 #pragma once 
 
+#include "cryp/version.hpp"
 #include <core/uuid.hpp>
 #include <vector>
 #include <array>
+#include <execution>
 
 namespace cryp
 {
+namespace priv
+{
+template <bool = false>
+struct default_execution_policy_
+{
+    inline constexpr static auto value = std::execution::seq;
+};
+
+template <>
+struct default_execution_policy_<true>
+{
+    inline constexpr static auto value = std::execution::par;
+};
+}
+
 class symcrypt
 {
 public:
@@ -20,6 +37,7 @@ private:
 public:
     explicit symcrypt(const crypto_key& key);
     explicit symcrypt(const core::uuid& uuid);
+    explicit symcrypt(const std::string_view &key);
 
     void encrypt(std::vector<uint8_t>& bytes);
     void decrypt(std::vector<uint8_t>& bytes);
@@ -27,6 +45,7 @@ public:
     inline const crypto_key& key() const { return key_; }
     inline void set_key(const crypto_key& key) { key_ = key; }
     inline void set_key(const core::uuid& key) { set_key(crypto_key(key.data())); }
+    void set_key(const std::string_view &key);
 
 private:
     // add/remove data size
@@ -49,7 +68,7 @@ private:
         {
             encrypt_byte_(byte, crypto_offset_(&*begin, &byte, offsets));
         };
-        std::for_each(/*std::execution::par,*/ begin, end, transform_byte);
+        std::for_each(priv::default_execution_policy_<has_tbb>::value, begin, end, transform_byte);
     }
 
     template <class Iter>
@@ -59,7 +78,7 @@ private:
         {
             decrypt_byte_(byte, crypto_offset_(&*begin, &byte, offsets));
         };
-        std::for_each(/*std::execution::par,*/ begin, end, transform_byte);
+        std::for_each(priv::default_execution_policy_<has_tbb>::value, begin, end, transform_byte);
     }
 
     uint8_t crypto_offset_(uint8_t* first_byte_iter, uint8_t* byte_iter, const Offsets& offsets);

@@ -14,6 +14,15 @@ symcrypt::symcrypt(const core::uuid& uuid)
     : key_(uuid.data())
 {}
 
+symcrypt::symcrypt(const std::string_view& key)
+    : key_(core::neutral_murmur_hash_array_16(key.data(), key.length()))
+{}
+
+void symcrypt::set_key(const std::string_view& key)
+{
+    key_ = core::neutral_murmur_hash_array_16(key.data(), key.length());
+}
+
 void symcrypt::encrypt(std::vector<uint8_t>& bytes)
 {
     resize_before_encrypt_(bytes);
@@ -76,7 +85,7 @@ void symcrypt::decrypt_bytes_(std::vector<uint8_t>& bytes)
 // encrypt/decrypt offsets
 void symcrypt::encrypt_and_stores_offsets_(std::vector<uint8_t>& bytes, const Offsets& offsets)
 {
-    uint64_t key_hash = core::murmur_hash_64(key_.data(), min_data_size);
+    uint64_t key_hash = core::neutral_murmur_hash_64(key_.data(), min_data_size);
     std::array key_hash_bytes = uint64_to_array8(key_hash);
 
     bytes.reserve(bytes.size() + offsets.size());
@@ -89,7 +98,7 @@ void symcrypt::encrypt_and_stores_offsets_(std::vector<uint8_t>& bytes, const Of
 
 void symcrypt::decrypt_and_retrieves_offsets_(std::vector<uint8_t>& bytes, Offsets& offsets)
 {
-    uint64_t key_hash = core::murmur_hash_64(key_.data(), min_data_size);
+    uint64_t key_hash = core::neutral_murmur_hash_64(key_.data(), min_data_size);
     std::array key_hash_bytes = uint64_to_array8(key_hash);
     std::span offsets_span(&*(bytes.end() - offsets.size()), offsets.size());
 
@@ -108,7 +117,8 @@ uint8_t symcrypt::crypto_offset_(uint8_t* first_byte_iter, uint8_t* byte_iter, c
 {
     std::size_t byte_index = byte_iter - first_byte_iter;
     uint8_t key_byte = key_[byte_index % min_data_size];
-    uint8_t offset = offsets[(byte_index + key_.back()) % offsets.size()]; // random start offset
+    std::size_t offset_index = key_.back() + byte_index + (byte_index / (offsets.size()+1));
+    uint8_t offset = offsets[offset_index % offsets.size()]; // random start offset
     offset += static_cast<uint8_t>(byte_index % 256); // avoid repetition
     offset += key_byte;
     return offset;
