@@ -20,6 +20,7 @@ private:
 public:
     explicit symcrypt(const crypto_key& key);
     explicit symcrypt(const core::uuid& uuid);
+    explicit symcrypt(const std::string_view &key);
 
     void encrypt(std::vector<uint8_t>& bytes);
     void decrypt(std::vector<uint8_t>& bytes);
@@ -27,6 +28,7 @@ public:
     inline const crypto_key& key() const { return key_; }
     inline void set_key(const crypto_key& key) { key_ = key; }
     inline void set_key(const core::uuid& key) { set_key(crypto_key(key.data())); }
+    void set_key(const std::string_view &key);
 
 private:
     // add/remove data size

@@ -14,6 +14,15 @@ symcrypt::symcrypt(const core::uuid& uuid)
     : key_(uuid.data())
 {}
 
+symcrypt::symcrypt(const std::string_view& key)
+    : key_(core::neutral_murmur_hash_array_16(key.data(), key.length()))
+{}
+
+void symcrypt::set_key(const std::string_view& key)
+{
+    key_ = core::neutral_murmur_hash_array_16(key.data(), key.length());
+}
+
 void symcrypt::encrypt(std::vector<uint8_t>& bytes)
 {
     resize_before_encrypt_(bytes);
