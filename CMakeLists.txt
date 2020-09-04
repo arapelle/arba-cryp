@@ -40,12 +40,20 @@ set(sources
 src/symcrypt.cpp
 )
 
+# Find TBB if wanted
+set(${PROJECT_NAME}_DEFAULT_EXECUTION_POLICY "Parallel" CACHE STRING "Choose the default execution policy." FORCE)
+set_property(CACHE ${PROJECT_NAME}_DEFAULT_EXECUTION_POLICY PROPERTY STRINGS "Parallel" "Sequenced")
+if(${${PROJECT_NAME}_DEFAULT_EXECUTION_POLICY} STREQUAL "Parallel")
+    find_package(TBB 2018 CONFIG)
+endif()
+
 # Add C++ library
 add_cpp_library(${PROJECT_NAME} ${PROJECT_NAME}_BUILD_SHARED_LIB ${PROJECT_NAME}_BUILD_STATIC_LIB
     SHARED ${PROJECT_NAME}
     STATIC ${PROJECT_NAME}-static
     CXX_STANDARD 20
     INCLUDE_DIRECTORIES include
+    INPUT_VERSION_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/include.in/version.hpp"
     OUTPUT_VERSION_HEADER "version.hpp"
     HEADERS ${headers}
     SOURCES ${sources}
@@ -57,8 +65,12 @@ if(NOT TARGET core)
     string(PREPEND core_target core::)
     find_package(core 0.2.0 REQUIRED CONFIG)
 endif()
+
 foreach(target ${project_targets})
     target_link_libraries(${target} PUBLIC ${core_target})
+    if(TBB_FOUND)
+        target_link_libraries(${target} PUBLIC TBB::tbb)
+    endif()
 endforeach()
 
 # Install C++ library
