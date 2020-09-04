@@ -179,7 +179,6 @@ TEST(cryp_tests, test_zero_data)
     std::vector<uint8_t> aux_data = data;
     display_data(data);
     ASSERT_NE(data, init_data);
-    ASSERT_NE(data[0], data[1]);
     symcrypt.decrypt(data);
     display_data(data);
     ASSERT_EQ(data, init_data);
@@ -212,6 +211,23 @@ TEST(cryp_tests, test_seq_data)
     symcrypt.decrypt(data);
     display_data(data);
     ASSERT_EQ(data, init_data);
+}
+
+TEST(cryp_tests, test_diversity)
+{
+    std::vector<uint8_t> data;
+    data.reserve(256 + 9);
+    data.resize(256, 0);
+    cryp::symcrypt symcrypt(core::uuid("2689d9bd-9626-4023-8842-d244d48fe3bb"));
+    symcrypt.encrypt(data);
+    ASSERT_EQ(data.capacity(), data.size());
+
+    std::vector<std::size_t> byte_counters(256, 0);
+    for (uint8_t byte : data)
+        ++(byte_counters[byte]);
+    auto counter_is_positive = [](const std::size_t& counter){ return counter > 0; };
+    std::size_t number_of_positive_counters = std::ranges::count_if(byte_counters, counter_is_positive);
+    ASSERT_GT(number_of_positive_counters, byte_counters.size()/2);
 }
 
 int main(int argc, char** argv)
