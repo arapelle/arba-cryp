@@ -55,7 +55,7 @@ add_cpp_library(${PROJECT_NAME} ${PROJECT_NAME}_BUILD_SHARED_LIB ${PROJECT_NAME}
 set(core_target core)
 if(NOT TARGET core)
     string(PREPEND core_target core::)
-    find_package(core 0.1.0 REQUIRED CONFIG)
+    find_package(core 0.2.0 REQUIRED CONFIG)
 endif()
 foreach(target ${project_targets})
     target_link_libraries(${target} PUBLIC ${core_target})
