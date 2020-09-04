@@ -117,7 +117,8 @@ uint8_t symcrypt::crypto_offset_(uint8_t* first_byte_iter, uint8_t* byte_iter, c
 {
     std::size_t byte_index = byte_iter - first_byte_iter;
     uint8_t key_byte = key_[byte_index % min_data_size];
-    uint8_t offset = offsets[(byte_index + key_.back()) % offsets.size()]; // random start offset
+    std::size_t offset_index = key_.back() + byte_index + (byte_index / (offsets.size()+1));
+    uint8_t offset = offsets[offset_index % offsets.size()]; // random start offset
     offset += static_cast<uint8_t>(byte_index % 256); // avoid repetition
     offset += key_byte;
     return offset;
