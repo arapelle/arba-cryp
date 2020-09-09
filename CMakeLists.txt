@@ -51,6 +51,7 @@ endif()
 add_cpp_library(${PROJECT_NAME} ${PROJECT_NAME}_BUILD_SHARED_LIB ${PROJECT_NAME}_BUILD_STATIC_LIB
     SHARED ${PROJECT_NAME}
     STATIC ${PROJECT_NAME}-static
+    NAMESPACE arba::
     CXX_STANDARD 20
     INCLUDE_DIRECTORIES include
     INPUT_VERSION_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/include.in/version.hpp"
@@ -77,7 +78,7 @@ endforeach()
 install_cpp_library_targets(${PROJECT_NAME}
                             TARGETS ${project_targets}
                             INCLUDE_DIRECTORIES "include/${PROJECT_NAME}"
-                            NAMESPACE ${PROJECT_NAME}::
+                            NAMESPACE arba::
                             )
 
 # Install package
