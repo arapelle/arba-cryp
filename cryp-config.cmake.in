@@ -1,7 +1,10 @@
 @PACKAGE_INIT@
 
 include(CMakeFindDependencyMacro)
-find_dependency(core 0.2.0)
+find_dependency(core 0.2.0 CONFIG)
+if(@TBB_FOUND@)
+    find_dependency(TBB 2018 CONFIG)
+endif()
 
 include(${CMAKE_CURRENT_LIST_DIR}/cryp.cmake)
 check_required_components(cryp)
