@@ -64,13 +64,10 @@ add_cpp_library(${PROJECT_NAME} ${PROJECT_NAME}_BUILD_SHARED_LIB ${PROJECT_NAME}
 if(NOT TARGET arba::core)
     find_package(core 0.3.1 REQUIRED CONFIG)
 endif()
-
-foreach(target ${project_targets})
-    target_link_libraries(${target} PUBLIC arba::core)
-    if(TBB_FOUND)
-        target_link_libraries(${target} PUBLIC TBB::tbb)
-    endif()
-endforeach()
+cpp_library_targets_link_libraries(${PROJECT_NAME} PUBLIC arba::core)
+if(TBB_FOUND)
+    cpp_library_targets_link_libraries(${PROJECT_NAME} PUBLIC TBB::tbb)
+endif()
 
 # Install C++ library
 install_cpp_library_targets(${PROJECT_NAME}
