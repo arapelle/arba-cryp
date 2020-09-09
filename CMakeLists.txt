@@ -15,7 +15,7 @@ set_build_type_if_undefined()
 # C++ PROJECT
 
 project(cryp
-        VERSION 0.2.2
+        VERSION 0.2.3
         DESCRIPTION "Small cryptographic library."
         HOMEPAGE_URL "https://github.com/arapelle/cryp"
         LANGUAGES CXX)
@@ -61,18 +61,13 @@ add_cpp_library(${PROJECT_NAME} ${PROJECT_NAME}_BUILD_SHARED_LIB ${PROJECT_NAME}
     BUILT_TARGETS project_targets
     )
 
-set(core_target core)
-if(NOT TARGET core)
-    string(PREPEND core_target core::)
-    find_package(core 0.2.0 REQUIRED CONFIG)
+if(NOT TARGET arba::core)
+    find_package(core 0.3.1 REQUIRED CONFIG)
 endif()
-
-foreach(target ${project_targets})
-    target_link_libraries(${target} PUBLIC ${core_target})
-    if(TBB_FOUND)
-        target_link_libraries(${target} PUBLIC TBB::tbb)
-    endif()
-endforeach()
+cpp_library_targets_link_libraries(${PROJECT_NAME} PUBLIC arba::core)
+if(TBB_FOUND)
+    cpp_library_targets_link_libraries(${PROJECT_NAME} PUBLIC TBB::tbb)
+endif()
 
 # Install C++ library
 install_cpp_library_targets(${PROJECT_NAME}

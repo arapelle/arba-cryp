@@ -1,7 +1,7 @@
 @PACKAGE_INIT@
 
 include(CMakeFindDependencyMacro)
-find_dependency(core 0.2.0 CONFIG)
+find_dependency(core 0.3.1 CONFIG)
 if(@TBB_FOUND@)
     find_dependency(TBB 2018 CONFIG)
 endif()

@@ -15,7 +15,7 @@ Binaries:
 
 Libraries:
 
-- [core](https://github.com/arapelle/core) 0.2 or later
+- [core](https://github.com/arapelle/core) 0.3.1 or later
 - [Google Test](https://github.com/google/googletest) 1.10 or later (only for testing)
 - [TBB](https://github.com/oneapi-src/oneTBB) 2018 or later (only if you want to use parallelization)
 
