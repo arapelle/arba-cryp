@@ -4,8 +4,8 @@ project(basic_cmake_project)
 
 add_executable(${PROJECT_NAME} main.cpp)
 # Find package cryp:
-find_package(cryp 0.1.0 CONFIG REQUIRED)
+find_package(cryp 0.2.2 CONFIG REQUIRED)
 # Use cryp release shared target:
-target_link_libraries(${PROJECT_NAME} PRIVATE cryp::cryp)
+target_link_libraries(${PROJECT_NAME} PRIVATE arba::cryp)
 # Use cryp release static target:
-#target_link_libraries(${PROJECT_NAME} PRIVATE cryp::cryp-static)
+#target_link_libraries(${PROJECT_NAME} PRIVATE arba::cryp-static)
