@@ -1,5 +1,5 @@
 #include <cryp/symcrypt.hpp>
-#include <core/hash.hpp>
+#include <arba/core/hash.hpp>
 #include <span>
 #include <bit>
 #include <experimental/random>
