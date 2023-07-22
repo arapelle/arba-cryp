@@ -6,10 +6,13 @@
 #include <array>
 #include <execution>
 
+inline namespace arba
+{
 namespace cryp
 {
 namespace priv
 {
+
 template <bool = false>
 struct default_execution_policy_
 {
@@ -21,6 +24,7 @@ struct default_execution_policy_<true>
 {
     inline constexpr static auto value = std::execution::par;
 };
+
 }
 
 class symcrypt
@@ -95,4 +99,6 @@ private:
 private:
     crypto_key key_;
 };
+
+}
 }

@@ -42,7 +42,7 @@ void display_data(const range_type& data)
 
 TEST(symcrypt_tests, test_construct_key)
 {
-    cryp::symcrypt::crypto_key key{ 16, 216, 58, 6, 182, 126, 102, 212, 190, 60, 177, 6, 172, 106, 62, 46 };
+    arba::cryp::symcrypt::crypto_key key{ 16, 216, 58, 6, 182, 126, 102, 212, 190, 60, 177, 6, 172, 106, 62, 46 };
     cryp::symcrypt::crypto_key expected_key = key;
     cryp::symcrypt symcrypt(key);
     ASSERT_EQ(symcrypt.key(), expected_key);

@@ -4,8 +4,11 @@
 #include <bit>
 #include <experimental/random>
 
+inline namespace arba
+{
 namespace cryp
 {
+
 symcrypt::symcrypt(const crypto_key& key)
     : key_(key)
 {}
@@ -159,5 +162,7 @@ std::array<uint8_t, 8> symcrypt::uint64_to_array8(uint64_t integer)
         integer /= 256;
     }
     return array;
+}
+
 }
 }
