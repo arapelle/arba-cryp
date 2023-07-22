@@ -1,0 +1,6 @@
+#pragma once
+
+namespace cryp
+{
+constexpr bool has_tbb = @TBB_FOUND@;
+}
