@@ -1,5 +1,4 @@
-#include <core/uuid.hpp>
-#include <core/hash.hpp>
+#include <arba/core/hash.hpp>
 #include <cryp/symcrypt.hpp>
 #include <gtest/gtest.h>
 #include <ranges>
@@ -41,7 +40,7 @@ void display_data(const range_type& data)
 
 //-----
 
-TEST(cryp_tests, test_construct_key)
+TEST(symcrypt_tests, test_construct_key)
 {
     cryp::symcrypt::crypto_key key{ 16, 216, 58, 6, 182, 126, 102, 212, 190, 60, 177, 6, 172, 106, 62, 46 };
     cryp::symcrypt::crypto_key expected_key = key;
@@ -49,21 +48,21 @@ TEST(cryp_tests, test_construct_key)
     ASSERT_EQ(symcrypt.key(), expected_key);
 }
 
-TEST(cryp_tests, test_construct_uuid)
+TEST(symcrypt_tests, test_construct_uuid)
 {
     core::uuid key("a869ad09-1e02-452b-81c8-2efc5dfa24ad");
     cryp::symcrypt symcrypt(key);
     ASSERT_EQ(symcrypt.key(), key.data());
 }
 
-TEST(cryp_tests, test_construct_string_view)
+TEST(symcrypt_tests, test_construct_string_view)
 {
     std::string_view key("my password 01A%^o");
     cryp::symcrypt symcrypt(key);
     ASSERT_EQ(symcrypt.key(), core::neutral_murmur_hash_array_16(key.data(), key.length()));
 }
 
-TEST(cryp_tests, test_set_key_key)
+TEST(symcrypt_tests, test_set_key_key)
 {
     cryp::symcrypt::crypto_key key{ 16, 216, 58, 6, 182, 126, 102, 212, 190, 60, 177, 6, 172, 106, 62, 46 };
     cryp::symcrypt symcrypt(key);
@@ -73,7 +72,7 @@ TEST(cryp_tests, test_set_key_key)
     ASSERT_EQ(symcrypt.key(), new_key);
 }
 
-TEST(cryp_tests, test_set_key_uuid)
+TEST(symcrypt_tests, test_set_key_uuid)
 {
     core::uuid key("a869ad09-1e02-452b-81c8-2efc5dfa24ad");
     cryp::symcrypt symcrypt(key);
@@ -84,7 +83,7 @@ TEST(cryp_tests, test_set_key_uuid)
     ASSERT_EQ(symcrypt.key(), new_key.data());
 }
 
-TEST(cryp_tests, test_set_key_string_view)
+TEST(symcrypt_tests, test_set_key_string_view)
 {
     std::string_view key("my password 01A%^o");
     cryp::symcrypt symcrypt(key);
@@ -95,7 +94,7 @@ TEST(cryp_tests, test_set_key_string_view)
     ASSERT_EQ(symcrypt.key(), core::neutral_murmur_hash_array_16(new_key.data(), new_key.length()));
 }
 
-TEST(cryp_tests, test_long_data)
+TEST(symcrypt_tests, test_long_data)
 {
     core::uuid key("a869ad09-1e02-452b-81c8-2efc5dfa24ad");
     cryp::symcrypt symcrypt(key);
@@ -118,7 +117,7 @@ TEST(cryp_tests, test_long_data)
     ASSERT_EQ(data, init_data);
 }
 
-TEST(cryp_tests, test_short_data)
+TEST(symcrypt_tests, test_short_data)
 {
     core::uuid key("a869ad09-1e02-452b-81c8-2efc5dfa24ad");
     cryp::symcrypt symcrypt(key);
@@ -143,7 +142,7 @@ TEST(cryp_tests, test_short_data)
     ASSERT_EQ(data, init_data);
 }
 
-TEST(cryp_tests, test_empty_data)
+TEST(symcrypt_tests, test_empty_data)
 {
     core::uuid key("a869ad09-1e02-452b-81c8-2efc5dfa24ad");
     cryp::symcrypt symcrypt(key);
@@ -167,7 +166,7 @@ TEST(cryp_tests, test_empty_data)
     ASSERT_EQ(data, init_data);
 }
 
-TEST(cryp_tests, test_zero_data)
+TEST(symcrypt_tests, test_zero_data)
 {
     core::uuid key("a869ad09-1e02-452b-81c8-2efc5dfa24ad");
     cryp::symcrypt symcrypt(key);
@@ -190,7 +189,7 @@ TEST(cryp_tests, test_zero_data)
     ASSERT_EQ(data, init_data);
 }
 
-TEST(cryp_tests, test_seq_data)
+TEST(symcrypt_tests, test_seq_data)
 {
     core::uuid key("a869ad09-1e02-452b-81c8-2efc5dfa24ad");
     cryp::symcrypt symcrypt(key);
@@ -213,7 +212,7 @@ TEST(cryp_tests, test_seq_data)
     ASSERT_EQ(data, init_data);
 }
 
-TEST(cryp_tests, test_diversity)
+TEST(symcrypt_tests, test_diversity)
 {
     std::vector<uint8_t> data;
     data.reserve(256 + 9);
@@ -228,10 +227,4 @@ TEST(cryp_tests, test_diversity)
     auto counter_is_positive = [](const std::size_t& counter){ return counter > 0; };
     std::size_t number_of_positive_counters = std::ranges::count_if(byte_counters, counter_is_positive);
     ASSERT_GT(number_of_positive_counters, byte_counters.size()/2);
-}
-
-int main(int argc, char** argv)
-{
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
 }
