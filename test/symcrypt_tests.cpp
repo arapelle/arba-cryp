@@ -1,5 +1,5 @@
 #include <arba/core/hash.hpp>
-#include <cryp/symcrypt.hpp>
+#include <arba/cryp/symcrypt.hpp>
 #include <gtest/gtest.h>
 #include <ranges>
 #include <cstdlib>

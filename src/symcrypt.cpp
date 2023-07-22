@@ -1,4 +1,4 @@
-#include <cryp/symcrypt.hpp>
+#include <arba/cryp/symcrypt.hpp>
 #include <arba/core/hash.hpp>
 #include <span>
 #include <bit>

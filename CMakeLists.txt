@@ -40,12 +40,12 @@ generate_version_macro_header(generated_version_header
                               ${project_namespace}/${project_base_name}/version.hpp)
 
 configure_headers(configured_headers
-    FILES include/cryp/config.hpp.in
+    FILES include/arba/cryp/config.hpp.in
 )
 
 ## Headers:
 set(headers
-    include/cryp/symcrypt.hpp
+    include/arba/cryp/symcrypt.hpp
 )
 
 # Sources:

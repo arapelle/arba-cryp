@@ -1,6 +1,6 @@
 #pragma once
 
-#include <cryp/config.hpp>
+#include <arba/cryp/config.hpp>
 #include <arba/core/uuid.hpp>
 #include <vector>
 #include <array>

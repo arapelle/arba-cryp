@@ -54,7 +54,7 @@ cmake -P cmake_uninstall.cmake
 ## Example - Generate a random word
 
 ```c++
-#include <cryp/symcrypt.hpp>
+#include <arba/cryp/symcrypt.hpp>
 #include <iostream>
 
 template <std::ranges::input_range range_type>
@@ -89,7 +89,7 @@ int main()
 ## Example - To measure time to encrypt and decrypt
 
 ```c++
-#include <cryp/symcrypt.hpp>
+#include <arba/cryp/symcrypt.hpp>
 #include <chrono>
 #include <experimental/random>
 #include <iostream>
