@@ -2,6 +2,7 @@
 
 #include <arba/cryp/config.hpp>
 #include <arba/core/uuid.hpp>
+#include <arba/core/random.hpp>
 #include <vector>
 #include <array>
 #include <execution>
@@ -32,6 +33,7 @@ class symcrypt
 public:
     inline constexpr static uint8_t min_data_size = sizeof(core::uuid);
     using crypto_key = std::array<uint8_t, min_data_size>;
+    using random_uint8_generator = std::function<uint8_t ()>;
 
 private:
     inline constexpr static uint8_t min_data_size_1 = min_data_size + 1;
@@ -39,9 +41,9 @@ private:
     using Offsets = std::array<uint8_t, 8>;
 
 public:
-    explicit symcrypt(const crypto_key& key);
-    explicit symcrypt(const core::uuid& uuid);
-    explicit symcrypt(const std::string_view &key);
+    explicit symcrypt(const crypto_key& key, random_uint8_generator rng = core::urng_u8<255>());
+    explicit symcrypt(const core::uuid& uuid, random_uint8_generator rng = core::urng_u8<255>());
+    explicit symcrypt(const std::string_view &key, random_uint8_generator rng = core::urng_u8<255>());
 
     void encrypt(std::vector<uint8_t>& bytes);
     void decrypt(std::vector<uint8_t>& bytes);
@@ -50,6 +52,9 @@ public:
     inline void set_key(const crypto_key& key) { key_ = key; }
     inline void set_key(const core::uuid& key) { set_key(crypto_key(key.data())); }
     void set_key(const std::string_view &key);
+
+    inline const random_uint8_generator& random_number_generator() const { return random_number_generator_; }
+    inline void set_random_number_generator(random_uint8_generator rng) { random_number_generator_ = std::move(rng); }
 
 private:
     // add/remove data size
@@ -92,12 +97,11 @@ private:
     void decrypt_byte_(uint8_t& byte, uint8_t crypto_offset);
 
     // utility
-    uint8_t rand_uint8();
-    Offsets rand_offsets();
-    std::array<uint8_t, 8> uint64_to_array8(uint64_t integer);
+    std::array<uint8_t, 8> uint64_to_array8_(uint64_t integer);
 
 private:
     crypto_key key_;
+    random_uint8_generator random_number_generator_;
 };
 
 }
