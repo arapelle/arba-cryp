@@ -28,7 +28,7 @@ git clone https://github.com/arapelle/arba-cryp --recurse-submodules
 There is a cmake script at the root of the project which builds the library in *Release* mode and install it (default options are used).
 
 ```
-cd /path/to/cryp
+cd /path/to/arba-cryp
 cmake -P cmake/scripts/quick_install.cmake
 ```
 
@@ -135,7 +135,7 @@ int main()
 }
 ```
 
-## Example - Using *cryp* in a CMake project
+## Example - Using *arba-cryp* in a CMake project
 
 See the *basic_cmake_project* example, and more specifically the *CMakeLists.txt* to see how to use *arba-cryp* in your CMake projects.
 
