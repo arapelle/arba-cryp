@@ -2,27 +2,25 @@
 
 The purpose is to provide simple cryptographic algorithms in C++.
 
-See [task board](https://app.gitkraken.com/glo/board/X1D-wj2bBQARup8C) for future updates and features.
-
 # Install
 
 ## Requirements
 
 Binaries:
-
-- A C++20 compiler (ex: g++-10)
-- CMake 3.16 or later
+- A C++20 compiler (ex: g++-13)
+- CMake 3.26 or later
 
 Libraries:
-
-- [core](https://github.com/arapelle/core) 0.3.2 or later
-- [Google Test](https://github.com/google/googletest) 1.10 or later (only for testing)
+- [arba-core](https://github.com/arapelle/arba-core) 0.14.0 or later
 - [TBB](https://github.com/oneapi-src/oneTBB) 2018 or later (only if you want to use parallelization)
+
+Testing Libraries (optional):
+- [Google Test](https://github.com/google/googletest) 1.13 or later (optional)
 
 ## Clone
 
 ```
-git clone https://github.com/arapelle/cryp --recurse-submodules
+git clone https://github.com/arapelle/arba-cryp --recurse-submodules
 ```
 
 ## Quick Install
@@ -30,14 +28,14 @@ git clone https://github.com/arapelle/cryp --recurse-submodules
 There is a cmake script at the root of the project which builds the library in *Release* mode and install it (default options are used).
 
 ```
-cd /path/to/cryp
-cmake -P cmake_quick_install.cmake
+cd /path/to/arba-cryp
+cmake -P cmake/scripts/quick_install.cmake
 ```
 
 Use the following to quickly install a different mode.
 
 ```
-cmake -DCMAKE_BUILD_TYPE=Debug -P cmake_quick_install.cmake
+cmake -P cmake/scripts/quick_install.cmake -- TESTS BUILD Debug DIR /tmp/local
 ```
 
 ## Uninstall
@@ -45,8 +43,8 @@ cmake -DCMAKE_BUILD_TYPE=Debug -P cmake_quick_install.cmake
 There is a uninstall cmake script created during installation. You can use it to uninstall properly this library.
 
 ```
-cd /path/to/installed-cryp/
-cmake -P cmake_uninstall.cmake
+cd /path/to/installed-arba-cryp/
+cmake -P uninstall.cmake
 ```
 
 # How to use
@@ -54,7 +52,7 @@ cmake -P cmake_uninstall.cmake
 ## Example - Generate a random word
 
 ```c++
-#include <cryp/symcrypt.hpp>
+#include <arba/cryp/symcrypt.hpp>
 #include <iostream>
 
 template <std::ranges::input_range range_type>
@@ -89,7 +87,7 @@ int main()
 ## Example - To measure time to encrypt and decrypt
 
 ```c++
-#include <cryp/symcrypt.hpp>
+#include <arba/cryp/symcrypt.hpp>
 #include <chrono>
 #include <experimental/random>
 #include <iostream>
@@ -137,10 +135,10 @@ int main()
 }
 ```
 
-## Example - Using *cryp* in a CMake project
+## Example - Using *arba-cryp* in a CMake project
 
-See the [basic cmake project](https://github.com/arapelle/cryp/tree/master/example/basic_cmake_project) example, and more specifically the [CMakeLists.txt](https://github.com/arapelle/cryp/tree/master/example/basic_cmake_project/CMakeLists.txt) to see how to use *wgen* in your CMake projects.
+See the *basic_cmake_project* example, and more specifically the *CMakeLists.txt* to see how to use *arba-cryp* in your CMake projects.
 
 # License
 
-[MIT License](https://github.com/arapelle/cryp/blob/master/LICENSE.md) © cryp
+[MIT License](./LICENSE.md) © arba-cryp

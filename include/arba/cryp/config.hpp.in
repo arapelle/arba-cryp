@@ -1,0 +1,11 @@
+#pragma once
+
+inline namespace arba
+{
+namespace cryp
+{
+
+constexpr bool has_tbb = @TBB_FOUND@;
+
+}
+}
