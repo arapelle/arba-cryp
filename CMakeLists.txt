@@ -16,7 +16,7 @@ set_build_type_ifndef()
 set(PROJECT_NAME "arba-cryp")
 set(project_namespace "arba")
 set(project_base_name "cryp")
-set(PROJECT_VERSION 0.3.0)
+set(PROJECT_VERSION 0.4.0)
 project(${PROJECT_NAME}
         VERSION ${PROJECT_VERSION}
         DESCRIPTION "Small cryptographic library."
