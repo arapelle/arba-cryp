@@ -5,7 +5,7 @@ inline namespace arba
 namespace cryp
 {
 
-constexpr bool has_tbb = @TBB_FOUND@;
+constexpr bool parallel_execution_is_available = static_cast<bool>(@ARBA_CRYP_PARALLEL_EXECUTION_IS_AVAILABLE@);
 
 }
 }

@@ -1,8 +1,11 @@
 #include <arba/cryp/symcrypt.hpp>
-#include <arba/core/hash.hpp>
+#include <arba/hash/murmur_hash.hpp>
 #include <span>
 #include <bit>
-#include <experimental/random>
+#include <algorithm>
+#if ARBA_CRYP_PARALLEL_EXECUTION_IS_AVAILABLE == 1
+#include <execution>
+#endif
 
 inline namespace arba
 {
@@ -13,18 +16,18 @@ symcrypt::symcrypt(const crypto_key& key, std::function<uint8_t ()> random_numbe
     : key_(key), random_number_generator_(std::move(random_number_generator))
 {}
 
-symcrypt::symcrypt(const core::uuid& uuid, std::function<uint8_t ()> random_number_generator)
+symcrypt::symcrypt(const uuid::uuid& uuid, std::function<uint8_t ()> random_number_generator)
     : key_(uuid.data()), random_number_generator_(std::move(random_number_generator))
 {}
 
 symcrypt::symcrypt(const std::string_view& key, std::function<uint8_t ()> random_number_generator)
-    : key_(core::neutral_murmur_hash_array_16(key.data(), key.length())),
+    : key_(hash::neutral_murmur_hash_array_16(key.data(), key.length())),
     random_number_generator_(std::move(random_number_generator))
 {}
 
 void symcrypt::set_key(const std::string_view& key)
 {
-    key_ = core::neutral_murmur_hash_array_16(key.data(), key.length());
+    key_ = hash::neutral_murmur_hash_array_16(key.data(), key.length());
 }
 
 void symcrypt::encrypt(std::vector<uint8_t>& bytes)
@@ -69,7 +72,7 @@ void symcrypt::encrypt_bytes_(std::vector<uint8_t>& bytes)
 {
     // Get offsets randomly so that twice encryption of the
     // same data do not generate the same byte sequence.
-    Offsets offs;
+    offsets offs;
     std::ranges::generate(offs, std::ref(random_number_generator_));
     // Encrypt the byte sequence.
     encrypt_seq_(bytes.begin(), bytes.end(), offs);
@@ -81,49 +84,75 @@ void symcrypt::encrypt_bytes_(std::vector<uint8_t>& bytes)
 void symcrypt::decrypt_bytes_(std::vector<uint8_t>& bytes)
 {
     // Get the offsets, and remove them from the byte sequence to decrypt.
-    Offsets offs;
+    offsets offs;
     decrypt_and_retrieves_offsets_(bytes, offs);
     // Decrypt the byte sequence.
     decrypt_seq_(bytes.begin(), bytes.end(), offs);
 }
 
 // encrypt/decrypt offsets
-void symcrypt::encrypt_and_stores_offsets_(std::vector<uint8_t>& bytes, const Offsets& offsets)
+void symcrypt::encrypt_and_stores_offsets_(std::vector<uint8_t>& bytes, const offsets& offs)
 {
-    uint64_t key_hash = core::neutral_murmur_hash_64(key_.data(), min_data_size);
+    uint64_t key_hash = hash::neutral_murmur_hash_64(key_.data(), min_data_size);
     std::array key_hash_bytes = uint64_to_array8_(key_hash);
 
-    bytes.reserve(bytes.size() + offsets.size());
-    for (auto key_iter = key_hash_bytes.begin(); const uint8_t& offset : offsets)
+    bytes.reserve(bytes.size() + offs.size());
+    for (auto key_iter = key_hash_bytes.begin(); const uint8_t& offset : offs)
     {
         bytes.push_back(offset + *key_iter);
         ++key_iter;
     }
 }
 
-void symcrypt::decrypt_and_retrieves_offsets_(std::vector<uint8_t>& bytes, Offsets& offsets)
+void symcrypt::decrypt_and_retrieves_offsets_(std::vector<uint8_t>& bytes, offsets& offs)
 {
-    uint64_t key_hash = core::neutral_murmur_hash_64(key_.data(), min_data_size);
+    uint64_t key_hash = hash::neutral_murmur_hash_64(key_.data(), min_data_size);
     std::array key_hash_bytes = uint64_to_array8_(key_hash);
-    std::span offsets_span(&*(bytes.end() - offsets.size()), offsets.size());
+    std::span offsets_span(&*(bytes.end() - offs.size()), offs.size());
 
     auto key_iter = key_hash_bytes.begin();
     auto span_iter = offsets_span.begin();
-    for (uint8_t& offset : offsets)
+    for (uint8_t& offset : offs)
     {
         offset = *span_iter - *key_iter;
         ++span_iter;
         ++key_iter;
     }
-    bytes.resize(bytes.size() - offsets.size());
+    bytes.resize(bytes.size() - offs.size());
 }
 
-uint8_t symcrypt::crypto_offset_(uint8_t* first_byte_iter, uint8_t* byte_iter, const Offsets& offsets)
+void symcrypt::encrypt_seq_(std::vector<uint8_t>::iterator begin, std::vector<uint8_t>::iterator end, const offsets& off)
+{
+    auto transform_byte = [&](uint8_t& byte)
+    {
+        encrypt_byte_(byte, this->crypto_offset_(&*begin, &byte, off));
+    };
+#if ARBA_CRYP_PARALLEL_EXECUTION_IS_AVAILABLE == 1
+    std::for_each(std::execution::par, begin, end, transform_byte);
+#else
+    std::for_each(begin, end, transform_byte);
+#endif
+}
+
+void symcrypt::decrypt_seq_(std::vector<uint8_t>::iterator begin, std::vector<uint8_t>::iterator end, const offsets& offs)
+{
+    auto transform_byte = [&](uint8_t& byte)
+    {
+        decrypt_byte_(byte, this->crypto_offset_(&*begin, &byte, offs));
+    };
+#if ARBA_CRYP_PARALLEL_EXECUTION_IS_AVAILABLE == 1
+    std::for_each(std::execution::par, begin, end, transform_byte);
+#else
+    std::for_each(begin, end, transform_byte);
+#endif
+}
+
+uint8_t symcrypt::crypto_offset_(uint8_t* first_byte_iter, uint8_t* byte_iter, const offsets& offs)
 {
     std::size_t byte_index = byte_iter - first_byte_iter;
     uint8_t key_byte = key_[byte_index % min_data_size];
-    std::size_t offset_index = key_.back() + byte_index + (byte_index / (offsets.size()+1));
-    uint8_t offset = offsets[offset_index % offsets.size()]; // random start offset
+    std::size_t offset_index = key_.back() + byte_index + (byte_index / (offs.size()+1));
+    uint8_t offset = offs[offset_index % offs.size()]; // random start offset
     offset += static_cast<uint8_t>(byte_index % 256); // avoid repetition
     offset += key_byte;
     return offset;
