@@ -1,11 +1,10 @@
 #include <arba/cryp/version.hpp>
 #include <gtest/gtest.h>
-#include <cstdlib>
 
-TEST(project_version_tests, test_version_macros)
+TEST(project_version_tests, test_version_core)
 {
-    ASSERT_EQ(ARBA_CRYP_VERSION_MAJOR, 0);
-    ASSERT_EQ(ARBA_CRYP_VERSION_MINOR, 4);
-    ASSERT_EQ(ARBA_CRYP_VERSION_PATCH, 0);
-    ASSERT_STREQ(ARBA_CRYP_VERSION, "0.4.0");
+    constexpr unsigned major = 0;
+    constexpr unsigned minor = 4;
+    constexpr unsigned patch = 0;
+    static_assert(arba::cryp::version.core() == arba::cppx::numver(major, minor, patch));
 }

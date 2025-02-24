@@ -1,6 +1,7 @@
 #include <arba/cryp/symcrypt.hpp>
+#include <arba/rand/rand.hpp>
 #include <chrono>
-#include <experimental/random>
+#include <algorithm>
 #include <iostream>
 
 using Duration = std::chrono::duration<float, ::std::chrono::milliseconds::period>;
@@ -9,7 +10,7 @@ using Time_point = std::chrono::time_point<Clock>;
 
 int main()
 {
-    core::uuid key("37c525c7-08f6-4cd1-8aff-ea3e38eaec87");
+    uuid::uuid key("37c525c7-08f6-4cd1-8aff-ea3e38eaec87");
     cryp::symcrypt symcrypt(key);
     std::vector<uint8_t> data;
     std::size_t data_size = 1024*1024*1024; // 1Gb
@@ -23,7 +24,7 @@ int main()
 
     std::cout << "Chrono '" << "generate data" <<  "' start!" << std::endl;
     start_time_point = Clock::now();
-    std::ranges::generate(data, [](){ return std::experimental::randint(0,256); });
+    std::ranges::generate(data, [](){ return rand::rand_u8(); });
     std::vector init_data = data;
     duration = std::chrono::duration_cast<Duration>(Clock::now() - start_time_point);
     std::cout << "Chrono '" << "generate data" <<  "' = " << duration.count() << "ms" << std::endl;

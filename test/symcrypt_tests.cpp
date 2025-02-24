@@ -1,7 +1,10 @@
-#include <arba/core/hash.hpp>
 #include <arba/cryp/symcrypt.hpp>
+#include <arba/cryp/config.hpp>
+#include <arba/hash/murmur_hash.hpp>
+#include <arba/rand/urng.hpp>
 #include <gtest/gtest.h>
 #include <ranges>
+#include <algorithm>
 #include <cstdlib>
 
 auto long_data()
@@ -50,7 +53,7 @@ TEST(symcrypt_tests, test_construct_key)
 
 TEST(symcrypt_tests, test_construct_uuid)
 {
-    core::uuid key("a869ad09-1e02-452b-81c8-2efc5dfa24ad");
+    uuid::uuid key("a869ad09-1e02-452b-81c8-2efc5dfa24ad");
     cryp::symcrypt symcrypt(key);
     ASSERT_EQ(symcrypt.key(), key.data());
 }
@@ -59,7 +62,7 @@ TEST(symcrypt_tests, test_construct_string_view)
 {
     std::string_view key("my password 01A%^o");
     cryp::symcrypt symcrypt(key);
-    ASSERT_EQ(symcrypt.key(), core::neutral_murmur_hash_array_16(key.data(), key.length()));
+    ASSERT_EQ(symcrypt.key(), hash::neutral_murmur_hash_array_16(key.data(), key.length()));
 }
 
 TEST(symcrypt_tests, test_set_key_key)
@@ -74,10 +77,10 @@ TEST(symcrypt_tests, test_set_key_key)
 
 TEST(symcrypt_tests, test_set_key_uuid)
 {
-    core::uuid key("a869ad09-1e02-452b-81c8-2efc5dfa24ad");
+    uuid::uuid key("a869ad09-1e02-452b-81c8-2efc5dfa24ad");
     cryp::symcrypt symcrypt(key);
     ASSERT_EQ(symcrypt.key(), key.data());
-    core::uuid new_key("8defc670-716b-4242-9932-3009bf3e6ecc");
+    uuid::uuid new_key("8defc670-716b-4242-9932-3009bf3e6ecc");
     ASSERT_NE(symcrypt.key(), new_key.data());
     symcrypt.set_key(new_key);
     ASSERT_EQ(symcrypt.key(), new_key.data());
@@ -87,17 +90,17 @@ TEST(symcrypt_tests, test_set_key_string_view)
 {
     std::string_view key("my password 01A%^o");
     cryp::symcrypt symcrypt(key);
-    ASSERT_EQ(symcrypt.key(), core::neutral_murmur_hash_array_16(key.data(), key.length()));
+    ASSERT_EQ(symcrypt.key(), hash::neutral_murmur_hash_array_16(key.data(), key.length()));
     std::string_view new_key("8defc670-716b-4242-9932-3009bf3e6ecc");
-    ASSERT_NE(symcrypt.key(), core::neutral_murmur_hash_array_16(new_key.data(), new_key.length()));
+    ASSERT_NE(symcrypt.key(), hash::neutral_murmur_hash_array_16(new_key.data(), new_key.length()));
     symcrypt.set_key(new_key);
-    ASSERT_EQ(symcrypt.key(), core::neutral_murmur_hash_array_16(new_key.data(), new_key.length()));
+    ASSERT_EQ(symcrypt.key(), hash::neutral_murmur_hash_array_16(new_key.data(), new_key.length()));
 }
 
 TEST(symcrypt_tests, test_long_data)
 {
-    core::uuid key("a869ad09-1e02-452b-81c8-2efc5dfa24ad");
-    cryp::symcrypt symcrypt(key, core::urng_u8<255>(42));
+    uuid::uuid key("a869ad09-1e02-452b-81c8-2efc5dfa24ad");
+    cryp::symcrypt symcrypt(key, rand::urng_u8<0, 255>(42));
     // Init clear data
     std::vector<uint8_t> init_data = long_data();
     std::vector<uint8_t> data = init_data;
@@ -125,8 +128,8 @@ TEST(symcrypt_tests, test_long_data)
 
 TEST(symcrypt_tests, test_short_data)
 {
-    core::uuid key("a869ad09-1e02-452b-81c8-2efc5dfa24ad");
-    cryp::symcrypt symcrypt(key, core::urng_u8<255>(42));
+    uuid::uuid key("a869ad09-1e02-452b-81c8-2efc5dfa24ad");
+    cryp::symcrypt symcrypt(key, rand::urng_u8<0, 255>(42));
     // Init clear data
     std::vector<uint8_t> init_data = short_data();
     std::vector<uint8_t> data = init_data;
@@ -156,8 +159,8 @@ TEST(symcrypt_tests, test_short_data)
 
 TEST(symcrypt_tests, test_empty_data)
 {
-    core::uuid key("a869ad09-1e02-452b-81c8-2efc5dfa24ad");
-    cryp::symcrypt symcrypt(key, core::urng_u8<255>(42));
+    uuid::uuid key("a869ad09-1e02-452b-81c8-2efc5dfa24ad");
+    cryp::symcrypt symcrypt(key, rand::urng_u8<0, 255>(42));
     // Init clear data
     std::vector<uint8_t> init_data = empty_data();
     std::vector<uint8_t> data = init_data;
@@ -185,8 +188,8 @@ TEST(symcrypt_tests, test_empty_data)
 
 TEST(symcrypt_tests, test_zero_data)
 {
-    core::uuid key("a869ad09-1e02-452b-81c8-2efc5dfa24ad");
-    cryp::symcrypt symcrypt(key, core::urng_u8<255>(42));
+    uuid::uuid key("a869ad09-1e02-452b-81c8-2efc5dfa24ad");
+    cryp::symcrypt symcrypt(key, rand::urng_u8<0, 255>(42));
     // Init clear data
     std::vector<uint8_t> init_data = zero_data();
     std::vector<uint8_t> data = init_data;
@@ -214,8 +217,8 @@ TEST(symcrypt_tests, test_zero_data)
 
 TEST(symcrypt_tests, test_seq_data)
 {
-    core::uuid key("a869ad09-1e02-452b-81c8-2efc5dfa24ad");
-    cryp::symcrypt symcrypt(key, core::urng_u8<255>(42));
+    uuid::uuid key("a869ad09-1e02-452b-81c8-2efc5dfa24ad");
+    cryp::symcrypt symcrypt(key, rand::urng_u8<0, 255>(42));
     // Init clear data
     std::vector<uint8_t> init_data = seq_data();
     std::vector<uint8_t> data = init_data;
@@ -246,7 +249,7 @@ TEST(symcrypt_tests, test_diversity)
     std::vector<uint8_t> data;
     data.reserve(256 + 9);
     data.resize(256, 0);
-    cryp::symcrypt symcrypt(core::uuid("2689d9bd-9626-4023-8842-d244d48fe3bb"), core::urng_u8<255>(42));
+    cryp::symcrypt symcrypt(uuid::uuid("2689d9bd-9626-4023-8842-d244d48fe3bb"), rand::urng_u8<0, 255>(42));
     symcrypt.encrypt(data);
     ASSERT_EQ(data.capacity(), data.size());
 
