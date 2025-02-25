@@ -1,8 +1,10 @@
 #include <arba/cryp/symcrypt.hpp>
+
 #include <arba/hash/murmur_hash.hpp>
-#include <span>
-#include <bit>
+
 #include <algorithm>
+#include <bit>
+#include <span>
 #if ARBA_CRYP_PARALLEL_EXECUTION_IS_AVAILABLE == 1
 #include <execution>
 #endif
@@ -12,18 +14,21 @@ inline namespace arba
 namespace cryp
 {
 
-symcrypt::symcrypt(const crypto_key& key, std::function<uint8_t ()> random_number_generator)
+symcrypt::symcrypt(const crypto_key& key, std::function<uint8_t()> random_number_generator)
     : key_(key), random_number_generator_(std::move(random_number_generator))
-{}
+{
+}
 
-symcrypt::symcrypt(const uuid::uuid& uuid, std::function<uint8_t ()> random_number_generator)
+symcrypt::symcrypt(const uuid::uuid& uuid, std::function<uint8_t()> random_number_generator)
     : key_(uuid.data()), random_number_generator_(std::move(random_number_generator))
-{}
+{
+}
 
-symcrypt::symcrypt(const std::string_view& key, std::function<uint8_t ()> random_number_generator)
+symcrypt::symcrypt(const std::string_view& key, std::function<uint8_t()> random_number_generator)
     : key_(hash::neutral_murmur_hash_array_16(key.data(), key.length())),
-    random_number_generator_(std::move(random_number_generator))
-{}
+      random_number_generator_(std::move(random_number_generator))
+{
+}
 
 void symcrypt::set_key(const std::string_view& key)
 {
@@ -50,7 +55,7 @@ void symcrypt::resize_before_encrypt_(std::vector<uint8_t>& bytes)
     {
         // The data are resized so that empty or very small data cannot be guessed.
         bytes_size = static_cast<uint8_t>(bytes.size());
-        for (; bytes.size() < min_data_size; )
+        for (; bytes.size() < min_data_size;)
             bytes.push_back(random_number_generator_());
     }
     // Size information is stored at the end of data.
@@ -121,12 +126,10 @@ void symcrypt::decrypt_and_retrieves_offsets_(std::vector<uint8_t>& bytes, offse
     bytes.resize(bytes.size() - offs.size());
 }
 
-void symcrypt::encrypt_seq_(std::vector<uint8_t>::iterator begin, std::vector<uint8_t>::iterator end, const offsets& off)
+void symcrypt::encrypt_seq_(std::vector<uint8_t>::iterator begin, std::vector<uint8_t>::iterator end,
+                            const offsets& off)
 {
-    auto transform_byte = [&](uint8_t& byte)
-    {
-        encrypt_byte_(byte, this->crypto_offset_(&*begin, &byte, off));
-    };
+    auto transform_byte = [&](uint8_t& byte) { encrypt_byte_(byte, this->crypto_offset_(&*begin, &byte, off)); };
 #if ARBA_CRYP_PARALLEL_EXECUTION_IS_AVAILABLE == 1
     std::for_each(std::execution::par, begin, end, transform_byte);
 #else
@@ -134,12 +137,10 @@ void symcrypt::encrypt_seq_(std::vector<uint8_t>::iterator begin, std::vector<ui
 #endif
 }
 
-void symcrypt::decrypt_seq_(std::vector<uint8_t>::iterator begin, std::vector<uint8_t>::iterator end, const offsets& offs)
+void symcrypt::decrypt_seq_(std::vector<uint8_t>::iterator begin, std::vector<uint8_t>::iterator end,
+                            const offsets& offs)
 {
-    auto transform_byte = [&](uint8_t& byte)
-    {
-        decrypt_byte_(byte, this->crypto_offset_(&*begin, &byte, offs));
-    };
+    auto transform_byte = [&](uint8_t& byte) { decrypt_byte_(byte, this->crypto_offset_(&*begin, &byte, offs)); };
 #if ARBA_CRYP_PARALLEL_EXECUTION_IS_AVAILABLE == 1
     std::for_each(std::execution::par, begin, end, transform_byte);
 #else
@@ -151,9 +152,9 @@ uint8_t symcrypt::crypto_offset_(uint8_t* first_byte_iter, uint8_t* byte_iter, c
 {
     std::size_t byte_index = byte_iter - first_byte_iter;
     uint8_t key_byte = key_[byte_index % min_data_size];
-    std::size_t offset_index = key_.back() + byte_index + (byte_index / (offs.size()+1));
+    std::size_t offset_index = key_.back() + byte_index + (byte_index / (offs.size() + 1));
     uint8_t offset = offs[offset_index % offs.size()]; // random start offset
-    offset += static_cast<uint8_t>(byte_index % 256); // avoid repetition
+    offset += static_cast<uint8_t>(byte_index % 256);  // avoid repetition
     offset += key_byte;
     return offset;
 }
@@ -161,7 +162,7 @@ uint8_t symcrypt::crypto_offset_(uint8_t* first_byte_iter, uint8_t* byte_iter, c
 // encrypt/decrypt byte
 void symcrypt::encrypt_byte_(uint8_t& byte, uint8_t crypto_offset)
 {
-    uint8_t aux = byte + crypto_offset; // Add an offset to the byte,
+    uint8_t aux = byte + crypto_offset;                                       // Add an offset to the byte,
     byte = std::rotl(aux, std::popcount(aux) * std::popcount(crypto_offset)); // bitwise left-rotate the byte.
 }
 
@@ -183,5 +184,5 @@ std::array<uint8_t, 8> symcrypt::uint64_to_array8_(uint64_t integer)
     return array;
 }
 
-}
-}
+} // namespace cryp
+} // namespace arba

@@ -1,5 +1,6 @@
-#include <arba/cryp/symcrypt.hpp>
 #include <arba/cryp/config.hpp>
+#include <arba/cryp/symcrypt.hpp>
+
 #include <iostream>
 
 template <std::ranges::input_range range_type>
