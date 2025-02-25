@@ -1,10 +1,11 @@
 #pragma once
 
-#include <arba/uuid/uuid.hpp>
 #include <arba/rand/urng.hpp>
-#include <vector>
+#include <arba/uuid/uuid.hpp>
+
 #include <array>
 #include <functional>
+#include <vector>
 
 inline namespace arba
 {
@@ -15,7 +16,7 @@ class symcrypt
 public:
     inline constexpr static uint8_t min_data_size = sizeof(uuid::uuid);
     using crypto_key = std::array<uint8_t, min_data_size>;
-    using random_uint8_generator = std::function<uint8_t ()>;
+    using random_uint8_generator = std::function<uint8_t()>;
 
 private:
     inline constexpr static uint8_t min_data_size_1 = min_data_size + 1;
@@ -25,7 +26,7 @@ private:
 public:
     explicit symcrypt(const crypto_key& key, random_uint8_generator rng = rand::urng_u8<0, 255>{});
     explicit symcrypt(const uuid::uuid& uuid, random_uint8_generator rng = rand::urng_u8<0, 255>{});
-    explicit symcrypt(const std::string_view &key, random_uint8_generator rng = rand::urng_u8<0, 255>{});
+    explicit symcrypt(const std::string_view& key, random_uint8_generator rng = rand::urng_u8<0, 255>{});
 
     void encrypt(std::vector<uint8_t>& bytes);
     void decrypt(std::vector<uint8_t>& bytes);
@@ -33,7 +34,7 @@ public:
     inline const crypto_key& key() const { return key_; }
     inline void set_key(const crypto_key& key) { key_ = key; }
     inline void set_key(const uuid::uuid& key) { set_key(crypto_key(key.data())); }
-    void set_key(const std::string_view &key);
+    void set_key(const std::string_view& key);
 
     inline const random_uint8_generator& random_number_generator() const { return random_number_generator_; }
     inline random_uint8_generator& random_number_generator() { return random_number_generator_; }
@@ -69,5 +70,5 @@ private:
     random_uint8_generator random_number_generator_;
 };
 
-}
-}
+} // namespace cryp
+} // namespace arba
