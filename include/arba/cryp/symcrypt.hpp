@@ -28,8 +28,8 @@ public:
     [[deprecated]] explicit symcrypt(const uuid::uuid& uuid, random_uint8_generator rng = rand::urng_u8<0, 255>{});
     explicit symcrypt(const std::string_view& key, random_uint8_generator rng = rand::urng_u8<0, 255>{});
 
-    void encrypt(std::vector<uint8_t>& bytes);
-    void decrypt(std::vector<uint8_t>& bytes);
+    void encrypt(std::vector<uint8_t>& bytes, bool use_parallel_execution = true);
+    void decrypt(std::vector<uint8_t>& bytes, bool use_parallel_execution = true);
 
     inline const crypto_key& key() const { return key_; }
     inline void set_key(const crypto_key& key) { key_ = key; }
@@ -45,16 +45,18 @@ private:
     void resize_after_decrypt_(std::vector<uint8_t>& bytes);
 
     // encrypt/decrypt bytes
-    void encrypt_bytes_(std::vector<uint8_t>& bytes);
-    void decrypt_bytes_(std::vector<uint8_t>& bytes);
+    void encrypt_bytes_(std::vector<uint8_t>& bytes, bool use_parallel_execution);
+    void decrypt_bytes_(std::vector<uint8_t>& bytes, bool use_parallel_execution);
 
     // encrypt/decrypt offsets
     void encrypt_and_stores_offsets_(std::vector<uint8_t>& bytes, const offsets& offs);
     void decrypt_and_retrieves_offsets_(std::vector<uint8_t>& bytes, offsets& offs);
 
     // encrypt/decrypt bytes
-    void encrypt_seq_(std::vector<uint8_t>::iterator begin, std::vector<uint8_t>::iterator end, const offsets& offs);
-    void decrypt_seq_(std::vector<uint8_t>::iterator begin, std::vector<uint8_t>::iterator end, const offsets& offs);
+    void encrypt_seq_(std::vector<uint8_t>::iterator begin, std::vector<uint8_t>::iterator end, const offsets& offs,
+                      bool use_parallel_execution);
+    void decrypt_seq_(std::vector<uint8_t>::iterator begin, std::vector<uint8_t>::iterator end, const offsets& offs,
+                      bool use_parallel_execution);
 
     uint8_t crypto_offset_(uint8_t* first_byte_iter, uint8_t* byte_iter, const offsets& off);
 
