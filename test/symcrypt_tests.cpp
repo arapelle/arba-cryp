@@ -102,7 +102,8 @@ TEST(symcrypt_tests, test_set_key_string_view)
 
 TEST(symcrypt_tests, test_long_data)
 {
-    uuid::uuid key("a869ad09-1e02-452b-81c8-2efc5dfa24ad");
+    cryp::symcrypt::crypto_key key{ 0xa8, 0x69, 0xad, 0x09, 0x1e, 0x02, 0x45, 0x2b,
+                                    0x81, 0xc8, 0x2e, 0xfc, 0x5d, 0xfa, 0x24, 0xad };
     cryp::symcrypt symcrypt(key, rand::urng_u8<0, 255>(42));
     // Init clear data
     std::vector<uint8_t> init_data = long_data();
@@ -135,7 +136,8 @@ TEST(symcrypt_tests, test_long_data)
 
 TEST(symcrypt_tests, test_short_data)
 {
-    uuid::uuid key("a869ad09-1e02-452b-81c8-2efc5dfa24ad");
+    cryp::symcrypt::crypto_key key{ 0xa8, 0x69, 0xad, 0x09, 0x1e, 0x02, 0x45, 0x2b,
+                                    0x81, 0xc8, 0x2e, 0xfc, 0x5d, 0xfa, 0x24, 0xad };
     cryp::symcrypt symcrypt(key, rand::urng_u8<0, 255>(42));
     // Init clear data
     std::vector<uint8_t> init_data = short_data();
@@ -170,7 +172,8 @@ TEST(symcrypt_tests, test_short_data)
 
 TEST(symcrypt_tests, test_empty_data)
 {
-    uuid::uuid key("a869ad09-1e02-452b-81c8-2efc5dfa24ad");
+    cryp::symcrypt::crypto_key key{ 0xa8, 0x69, 0xad, 0x09, 0x1e, 0x02, 0x45, 0x2b,
+                                    0x81, 0xc8, 0x2e, 0xfc, 0x5d, 0xfa, 0x24, 0xad };
     cryp::symcrypt symcrypt(key, rand::urng_u8<0, 255>(42));
     // Init clear data
     std::vector<uint8_t> init_data = empty_data();
@@ -203,7 +206,8 @@ TEST(symcrypt_tests, test_empty_data)
 
 TEST(symcrypt_tests, test_zero_data)
 {
-    uuid::uuid key("a869ad09-1e02-452b-81c8-2efc5dfa24ad");
+    cryp::symcrypt::crypto_key key{ 0xa8, 0x69, 0xad, 0x09, 0x1e, 0x02, 0x45, 0x2b,
+                                    0x81, 0xc8, 0x2e, 0xfc, 0x5d, 0xfa, 0x24, 0xad };
     cryp::symcrypt symcrypt(key, rand::urng_u8<0, 255>(42));
     // Init clear data
     std::vector<uint8_t> init_data = zero_data();
@@ -236,7 +240,8 @@ TEST(symcrypt_tests, test_zero_data)
 
 TEST(symcrypt_tests, test_seq_data)
 {
-    uuid::uuid key("a869ad09-1e02-452b-81c8-2efc5dfa24ad");
+    cryp::symcrypt::crypto_key key{ 0xa8, 0x69, 0xad, 0x09, 0x1e, 0x02, 0x45, 0x2b,
+                                    0x81, 0xc8, 0x2e, 0xfc, 0x5d, 0xfa, 0x24, 0xad };
     cryp::symcrypt symcrypt(key, rand::urng_u8<0, 255>(42));
     // Init clear data
     std::vector<uint8_t> init_data = seq_data();
@@ -272,7 +277,9 @@ TEST(symcrypt_tests, test_diversity)
     std::vector<uint8_t> data;
     data.reserve(256 + 9);
     data.resize(256, 0);
-    cryp::symcrypt symcrypt(uuid::uuid("2689d9bd-9626-4023-8842-d244d48fe3bb"), rand::urng_u8<0, 255>(42));
+    cryp::symcrypt::crypto_key key{ 0x26, 0x89, 0xd9, 0xbd, 0x96, 0x26, 0x40, 0x23,
+                                    0x88, 0x42, 0xd2, 0x44, 0xd4, 0x8f, 0xe3, 0xbb };
+    cryp::symcrypt symcrypt(key, rand::urng_u8<0, 255>(42));
     symcrypt.encrypt(data);
     ASSERT_EQ(data.capacity(), data.size());
 
