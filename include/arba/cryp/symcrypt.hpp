@@ -25,7 +25,7 @@ private:
 
 public:
     explicit symcrypt(const crypto_key& key, random_uint8_generator rng = rand::urng_u8<0, 255>{});
-    explicit symcrypt(const uuid::uuid& uuid, random_uint8_generator rng = rand::urng_u8<0, 255>{});
+    [[deprecated]] explicit symcrypt(const uuid::uuid& uuid, random_uint8_generator rng = rand::urng_u8<0, 255>{});
     explicit symcrypt(const std::string_view& key, random_uint8_generator rng = rand::urng_u8<0, 255>{});
 
     void encrypt(std::vector<uint8_t>& bytes);
@@ -33,7 +33,7 @@ public:
 
     inline const crypto_key& key() const { return key_; }
     inline void set_key(const crypto_key& key) { key_ = key; }
-    inline void set_key(const uuid::uuid& key) { set_key(crypto_key(key.data())); }
+    [[deprecated]] inline void set_key(const uuid::uuid& key) { set_key(crypto_key(key.data())); }
     void set_key(const std::string_view& key);
 
     inline const random_uint8_generator& random_number_generator() const { return random_number_generator_; }
