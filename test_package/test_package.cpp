@@ -1,5 +1,6 @@
 #include <arba/cryp/config.hpp>
 #include <arba/cryp/symcrypt.hpp>
+#include <arba/cryp/version.hpp>
 
 #include <iostream>
 
@@ -30,5 +31,6 @@ int main()
     symcrypt.decrypt(data);
     display_data("       decrypted data", data);
 
+    std::cout << "TEST PACKAGE SUCCESS" << std::endl;
     return EXIT_SUCCESS;
 }
