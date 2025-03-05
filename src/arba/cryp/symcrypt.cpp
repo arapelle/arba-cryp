@@ -101,6 +101,7 @@ void symcrypt::encrypt_and_stores_offsets_(std::vector<uint8_t>& bytes, const of
 {
     uint64_t key_hash = hash::neutral_murmur_hash_64(key_.data(), min_data_size);
     std::array key_hash_bytes = uint64_to_array8_(key_hash);
+    start__ = hash::neutral_murmur_hash_64(key_);
 
     bytes.reserve(bytes.size() + offs.size());
     for (auto key_iter = key_hash_bytes.begin(); const uint8_t& offset : offs)
@@ -115,6 +116,7 @@ void symcrypt::decrypt_and_retrieves_offsets_(std::vector<uint8_t>& bytes, offse
     uint64_t key_hash = hash::neutral_murmur_hash_64(key_.data(), min_data_size);
     std::array key_hash_bytes = uint64_to_array8_(key_hash);
     std::span offsets_span(&*(bytes.end() - offs.size()), offs.size());
+    start__ = hash::neutral_murmur_hash_64(key_);
 
     auto key_iter = key_hash_bytes.begin();
     auto span_iter = offsets_span.begin();
@@ -132,9 +134,12 @@ void symcrypt::encrypt_seq_(std::vector<uint8_t>::iterator begin, std::vector<ui
 {
     auto transform_byte = [&](uint8_t& byte)
     {
-        uint8_t offset = this->crypto_offset_(&*begin, &byte, offs);
-        uint8_t aux = byte + offset;                                       // Add an offset to the byte,
-        byte = std::rotl(aux, std::popcount(aux) * std::popcount(offset)); // bitwise left-rotate the byte.
+        auto [offset, shift] = this->crypto_modifiers_(&*begin, &byte, offs);
+        uint8_t aux = byte + offset; // Add an offset to the byte,
+        byte = std::rotl(aux, shift); // bitwise left-rotate the byte.
+//        uint8_t offset = this->crypto_offset_(&*begin, &byte, offs);
+//        uint8_t aux = byte + offset;
+//        byte = std::rotl(aux, std::popcount(aux) * std::popcount(offset));
     };
 #if ARBA_CRYP_PARALLEL_EXECUTION_IS_AVAILABLE == 1
     if (use_parallel_execution) [[likely]]
@@ -151,9 +156,10 @@ void symcrypt::decrypt_seq_(std::vector<uint8_t>::iterator begin, std::vector<ui
 {
     auto transform_byte = [&](uint8_t& byte)
     {
-        uint8_t offset = this->crypto_offset_(&*begin, &byte, offs);
-        // bitwise right-rotate the byte and remove the offset.
-        byte = std::rotr(byte, std::popcount(byte) * std::popcount(offset)) - offset;
+        auto [offset, shift] = this->crypto_modifiers_(&*begin, &byte, offs);
+        byte = std::rotr(byte, shift) - offset; // bitwise right-rotate the byte and remove the offset.
+//        uint8_t offset = this->crypto_offset_(&*begin, &byte, offs);
+//        byte = std::rotr(byte, std::popcount(byte) * std::popcount(offset)) - offset;
     };
 #if ARBA_CRYP_PARALLEL_EXECUTION_IS_AVAILABLE == 1
     if (use_parallel_execution) [[likely]]
@@ -174,6 +180,17 @@ uint8_t symcrypt::crypto_offset_(uint8_t* first_byte_iter, uint8_t* byte_iter, c
     offset += static_cast<uint8_t>(byte_index % 256);  // avoid repetition
     offset += key_byte;
     return offset;
+}
+
+std::pair<uint8_t, int> symcrypt::crypto_modifiers_(uint8_t* first_byte_iter, uint8_t* byte_iter, const offsets& offs)
+{
+    std::size_t byte_index = /*start_byte_index_*/ start__ + (byte_iter - first_byte_iter);
+    std::size_t offset_index = byte_index + (byte_index / 10);
+    uint8_t modifier = offs[offset_index % 7] + key_[byte_index % key_.size()];
+    std::pair<uint8_t, int> res{ modifier, modifier };
+    res.first += static_cast<uint8_t>(byte_index % 257);
+    res.second += static_cast<int>(++byte_index % 11);
+    return res;
 }
 
 // utility

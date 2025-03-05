@@ -29,6 +29,7 @@ int main()
     display_data("second encrypted data", data);
     symcrypt.decrypt(data);
     display_data("       decrypted data", data);
+    std::cout << "data == init_data: " << std::boolalpha << (data == init_data) << std::endl;
 
     return EXIT_SUCCESS;
 }
