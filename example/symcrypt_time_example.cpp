@@ -26,7 +26,9 @@ int main()
 
     std::cout << "Chrono '" << "generate data" << "' start!" << std::endl;
     start_time_point = Clock::now();
-    std::ranges::generate(data, []() { return rand::rand_u8(); });
+    auto data_span = std::as_writable_bytes(std::span(data));
+    std::ranges::generate(std::span(reinterpret_cast<uint64_t*>(data_span.data()), data_span.size() / sizeof(uint64_t)),
+                          []() { return rand::rand_u64(); });
     std::vector init_data = data;
     duration = std::chrono::duration_cast<Duration>(Clock::now() - start_time_point);
     std::cout << "Chrono '" << "generate data" << "' = " << duration.count() << "ms" << std::endl;
