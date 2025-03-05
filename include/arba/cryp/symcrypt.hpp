@@ -59,6 +59,7 @@ private:
                       bool use_parallel_execution);
 
     uint8_t crypto_offset_(uint8_t* first_byte_iter, uint8_t* byte_iter, const offsets& off);
+    std::pair<uint8_t, int> crypto_modifiers_(uint8_t *first_byte_iter, uint8_t *byte_iter, const offsets& offs);
 
     // utility
     std::array<uint8_t, 8> uint64_to_array8_(uint64_t integer);
@@ -66,6 +67,7 @@ private:
 private:
     crypto_key key_;
     random_uint8_generator random_number_generator_;
+    std::size_t start__;
 };
 
 } // namespace cryp
