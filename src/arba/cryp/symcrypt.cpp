@@ -128,9 +128,14 @@ void symcrypt::decrypt_and_retrieves_offsets_(std::vector<uint8_t>& bytes, offse
 }
 
 void symcrypt::encrypt_seq_(std::vector<uint8_t>::iterator begin, std::vector<uint8_t>::iterator end,
-                            const offsets& off, [[maybe_unused]] bool use_parallel_execution)
+                            const offsets& offs, [[maybe_unused]] bool use_parallel_execution)
 {
-    auto transform_byte = [&](uint8_t& byte) { encrypt_byte_(byte, this->crypto_offset_(&*begin, &byte, off)); };
+    auto transform_byte = [&](uint8_t& byte)
+    {
+        uint8_t offset = this->crypto_offset_(&*begin, &byte, offs);
+        uint8_t aux = byte + offset;                                       // Add an offset to the byte,
+        byte = std::rotl(aux, std::popcount(aux) * std::popcount(offset)); // bitwise left-rotate the byte.
+    };
 #if ARBA_CRYP_PARALLEL_EXECUTION_IS_AVAILABLE == 1
     if (use_parallel_execution) [[likely]]
         std::for_each(std::execution::par, begin, end, transform_byte);
@@ -144,7 +149,12 @@ void symcrypt::encrypt_seq_(std::vector<uint8_t>::iterator begin, std::vector<ui
 void symcrypt::decrypt_seq_(std::vector<uint8_t>::iterator begin, std::vector<uint8_t>::iterator end,
                             const offsets& offs, [[maybe_unused]] bool use_parallel_execution)
 {
-    auto transform_byte = [&](uint8_t& byte) { decrypt_byte_(byte, this->crypto_offset_(&*begin, &byte, offs)); };
+    auto transform_byte = [&](uint8_t& byte)
+    {
+        uint8_t offset = this->crypto_offset_(&*begin, &byte, offs);
+        // bitwise right-rotate the byte and remove the offset.
+        byte = std::rotr(byte, std::popcount(byte) * std::popcount(offset)) - offset;
+    };
 #if ARBA_CRYP_PARALLEL_EXECUTION_IS_AVAILABLE == 1
     if (use_parallel_execution) [[likely]]
         std::for_each(std::execution::par, begin, end, transform_byte);
@@ -164,19 +174,6 @@ uint8_t symcrypt::crypto_offset_(uint8_t* first_byte_iter, uint8_t* byte_iter, c
     offset += static_cast<uint8_t>(byte_index % 256);  // avoid repetition
     offset += key_byte;
     return offset;
-}
-
-// encrypt/decrypt byte
-void symcrypt::encrypt_byte_(uint8_t& byte, uint8_t crypto_offset)
-{
-    uint8_t aux = byte + crypto_offset;                                       // Add an offset to the byte,
-    byte = std::rotl(aux, std::popcount(aux) * std::popcount(crypto_offset)); // bitwise left-rotate the byte.
-}
-
-void symcrypt::decrypt_byte_(uint8_t& byte, uint8_t crypto_offset)
-{
-    // bitwise right-rotate the byte and remove the offset.
-    byte = std::rotr(byte, std::popcount(byte) * std::popcount(crypto_offset)) - crypto_offset;
 }
 
 // utility

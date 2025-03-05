@@ -60,10 +60,6 @@ private:
 
     uint8_t crypto_offset_(uint8_t* first_byte_iter, uint8_t* byte_iter, const offsets& off);
 
-    // encrypt/decrypt byte
-    void encrypt_byte_(uint8_t& byte, uint8_t crypto_offset);
-    void decrypt_byte_(uint8_t& byte, uint8_t crypto_offset);
-
     // utility
     std::array<uint8_t, 8> uint64_to_array8_(uint64_t integer);
 
