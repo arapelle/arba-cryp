@@ -32,7 +32,7 @@ public:
     void decrypt(std::vector<uint8_t>& bytes, bool use_parallel_execution = true);
 
     inline const crypto_key& key() const { return key_; }
-    inline void set_key(const crypto_key& key) { key_ = key; }
+    void set_key(const crypto_key& key);
     [[deprecated]] inline void set_key(const uuid::uuid& key) { set_key(crypto_key(key.data())); }
     void set_key(const std::string_view& key);
 
@@ -67,7 +67,7 @@ private:
 private:
     crypto_key key_;
     random_uint8_generator random_number_generator_;
-    std::size_t start__;
+    std::size_t start_byte_index_;
 };
 
 } // namespace cryp

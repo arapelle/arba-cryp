@@ -3,6 +3,7 @@
 
 #include <arba/hash/murmur_hash.hpp>
 
+#include <iostream>
 #include <algorithm>
 #include <bit>
 #include <span>
@@ -31,9 +32,15 @@ symcrypt::symcrypt(const std::string_view& key, std::function<uint8_t()> random_
 {
 }
 
+void symcrypt::set_key(const crypto_key &key)
+{
+    key_ = key;
+    start_byte_index_ = hash::neutral_murmur_hash_64(key_);
+}
+
 void symcrypt::set_key(const std::string_view& key)
 {
-    key_ = hash::neutral_murmur_hash_array_16(key.data(), key.length());
+    set_key(hash::neutral_murmur_hash_array_16(key));
 }
 
 void symcrypt::encrypt(std::vector<uint8_t>& bytes, bool use_parallel_execution)
@@ -101,7 +108,6 @@ void symcrypt::encrypt_and_stores_offsets_(std::vector<uint8_t>& bytes, const of
 {
     uint64_t key_hash = hash::neutral_murmur_hash_64(key_.data(), min_data_size);
     std::array key_hash_bytes = uint64_to_array8_(key_hash);
-    start__ = hash::neutral_murmur_hash_64(key_);
 
     bytes.reserve(bytes.size() + offs.size());
     for (auto key_iter = key_hash_bytes.begin(); const uint8_t& offset : offs)
@@ -116,7 +122,6 @@ void symcrypt::decrypt_and_retrieves_offsets_(std::vector<uint8_t>& bytes, offse
     uint64_t key_hash = hash::neutral_murmur_hash_64(key_.data(), min_data_size);
     std::array key_hash_bytes = uint64_to_array8_(key_hash);
     std::span offsets_span(&*(bytes.end() - offs.size()), offs.size());
-    start__ = hash::neutral_murmur_hash_64(key_);
 
     auto key_iter = key_hash_bytes.begin();
     auto span_iter = offsets_span.begin();
@@ -137,6 +142,7 @@ void symcrypt::encrypt_seq_(std::vector<uint8_t>::iterator begin, std::vector<ui
         auto [offset, shift] = this->crypto_modifiers_(&*begin, &byte, offs);
         uint8_t aux = byte + offset; // Add an offset to the byte,
         byte = std::rotl(aux, shift); // bitwise left-rotate the byte.
+
 //        uint8_t offset = this->crypto_offset_(&*begin, &byte, offs);
 //        uint8_t aux = byte + offset;
 //        byte = std::rotl(aux, std::popcount(aux) * std::popcount(offset));
@@ -157,7 +163,9 @@ void symcrypt::decrypt_seq_(std::vector<uint8_t>::iterator begin, std::vector<ui
     auto transform_byte = [&](uint8_t& byte)
     {
         auto [offset, shift] = this->crypto_modifiers_(&*begin, &byte, offs);
-        byte = std::rotr(byte, shift) - offset; // bitwise right-rotate the byte and remove the offset.
+        uint8_t aux = std::rotr(byte, shift);
+        byte = aux - offset; // bitwise right-rotate the byte and remove the offset.
+
 //        uint8_t offset = this->crypto_offset_(&*begin, &byte, offs);
 //        byte = std::rotr(byte, std::popcount(byte) * std::popcount(offset)) - offset;
     };
@@ -184,12 +192,12 @@ uint8_t symcrypt::crypto_offset_(uint8_t* first_byte_iter, uint8_t* byte_iter, c
 
 std::pair<uint8_t, int> symcrypt::crypto_modifiers_(uint8_t* first_byte_iter, uint8_t* byte_iter, const offsets& offs)
 {
-    std::size_t byte_index = /*start_byte_index_*/ start__ + (byte_iter - first_byte_iter);
+    std::size_t byte_index = start_byte_index_ + (byte_iter - first_byte_iter);
     std::size_t offset_index = byte_index + (byte_index / 10);
     uint8_t modifier = offs[offset_index % 7] + key_[byte_index % key_.size()];
     std::pair<uint8_t, int> res{ modifier, modifier };
     res.first += static_cast<uint8_t>(byte_index % 257);
-    res.second += static_cast<int>(++byte_index % 11);
+    res.second += static_cast<int>(++byte_index % 9);
     return res;
 }
 
