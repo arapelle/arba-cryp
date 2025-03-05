@@ -21,14 +21,17 @@ int main()
     std::vector<uint8_t> init_data{ 55, 79, 3, 220, 75, 225, 113, 112, 227, 138, 26, 140, 88, 111, 30, 107, 157, 45 };
     std::vector<uint8_t> data = init_data;
     display_data("                 data", data);
-    symcrypt.encrypt(data);
+
+    symcrypt.encrypt(data, false);
     display_data("       encrypted data", data);
-    symcrypt.decrypt(data);
+    symcrypt.decrypt(data, false);
     display_data("       decrypted data", data);
-    symcrypt.encrypt(data);
+
+    symcrypt.encrypt(data, false);
     display_data("second encrypted data", data);
-    symcrypt.decrypt(data);
+    symcrypt.decrypt(data, false);
     display_data("       decrypted data", data);
+
     std::cout << "data == init_data: " << std::boolalpha << (data == init_data) << std::endl;
 
     return EXIT_SUCCESS;
