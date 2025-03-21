@@ -1,6 +1,6 @@
-add_cpp_library_examples(
-    SHARED ${PROJECT_NAME}
-    STATIC ${PROJECT_NAME}-static
+include(cmtk/CppLibraryExamples)
+
+add_cpp_library_basic_examples(${PROJECT_TARGET_NAME}
     SOURCES
         symcrypt_example.cpp
         symcrypt_time_example.cpp
