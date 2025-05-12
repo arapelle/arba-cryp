@@ -54,13 +54,6 @@ TEST(symcrypt_tests, test_construct_key)
     ASSERT_EQ(symcrypt.key(), expected_key);
 }
 
-TEST(symcrypt_tests, test_construct_uuid)
-{
-    uuid::uuid key("a869ad09-1e02-452b-81c8-2efc5dfa24ad");
-    cryp::symcrypt symcrypt(key);
-    ASSERT_EQ(symcrypt.key(), key.data());
-}
-
 TEST(symcrypt_tests, test_construct_string_view)
 {
     std::string_view key("my password 01A%^o");
@@ -76,17 +69,6 @@ TEST(symcrypt_tests, test_set_key_key)
     ASSERT_NE(symcrypt.key(), new_key);
     symcrypt.set_key(new_key);
     ASSERT_EQ(symcrypt.key(), new_key);
-}
-
-TEST(symcrypt_tests, test_set_key_uuid)
-{
-    uuid::uuid key("a869ad09-1e02-452b-81c8-2efc5dfa24ad");
-    cryp::symcrypt symcrypt(key);
-    ASSERT_EQ(symcrypt.key(), key.data());
-    uuid::uuid new_key("8defc670-716b-4242-9932-3009bf3e6ecc");
-    ASSERT_NE(symcrypt.key(), new_key.data());
-    symcrypt.set_key(new_key);
-    ASSERT_EQ(symcrypt.key(), new_key.data());
 }
 
 TEST(symcrypt_tests, test_set_key_string_view)

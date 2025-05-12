@@ -20,11 +20,6 @@ symcrypt::symcrypt(const crypto_key& key, std::function<uint8_t()> random_number
 {
 }
 
-symcrypt::symcrypt(const uuid::uuid& uuid, std::function<uint8_t()> random_number_generator)
-    : key_(uuid.data()), random_number_generator_(std::move(random_number_generator))
-{
-}
-
 symcrypt::symcrypt(const std::string_view& key, std::function<uint8_t()> random_number_generator)
     : key_(hash::neutral_murmur_hash_array_16(key.data(), key.length())),
       random_number_generator_(std::move(random_number_generator))
