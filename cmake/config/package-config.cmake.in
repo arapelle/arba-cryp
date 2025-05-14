@@ -2,8 +2,8 @@
 @PACKAGE_INIT@
 
 include(CMakeFindDependencyMacro)
-find_dependency(arba-rand 0.2.0 CONFIG)
-find_dependency(arba-hash 0.2.0 CONFIG)
+find_dependency(arba-rand 0.3.0 CONFIG)
+find_dependency(arba-hash 0.3.0 CONFIG)
 if(${${PROJECT_UPPER_VAR_NAME}_PARALLEL_EXECUTION})
     find_dependency(TBB 2018 CONFIG)
 endif()

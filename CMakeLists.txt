@@ -85,8 +85,8 @@ if(${${PROJECT_UPPER_VAR_NAME}_PARALLEL_EXECUTION})
 endif()
 
 ## Link C++ targets:
-find_package(arba-rand 0.2.0 REQUIRED CONFIG)
-find_package(arba-hash 0.2.0 REQUIRED CONFIG)
+find_package(arba-rand 0.3.0 REQUIRED CONFIG)
+find_package(arba-hash 0.3.0 REQUIRED CONFIG)
 target_link_libraries(${PROJECT_TARGET_NAME}
     PUBLIC
         arba::rand
