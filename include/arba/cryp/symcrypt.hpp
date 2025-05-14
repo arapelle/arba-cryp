@@ -1,7 +1,6 @@
 #pragma once
 
 #include <arba/rand/urng.hpp>
-#include <arba/uuid/uuid.hpp>
 
 #include <array>
 #include <functional>
@@ -14,7 +13,7 @@ namespace cryp
 class symcrypt
 {
 public:
-    inline constexpr static uint8_t min_data_size = sizeof(uuid::uuid);
+    inline constexpr static uint8_t min_data_size = 16;
     using crypto_key = std::array<uint8_t, min_data_size>;
     using random_uint8_generator = std::function<uint8_t()>;
 
@@ -25,7 +24,6 @@ private:
 
 public:
     explicit symcrypt(const crypto_key& key, random_uint8_generator rng = rand::urng_u8<0, 255>{});
-    [[deprecated]] explicit symcrypt(const uuid::uuid& uuid, random_uint8_generator rng = rand::urng_u8<0, 255>{});
     explicit symcrypt(const std::string_view& key, random_uint8_generator rng = rand::urng_u8<0, 255>{});
 
     void encrypt(std::vector<uint8_t>& bytes, bool use_parallel_execution = true);
@@ -33,7 +31,6 @@ public:
 
     inline const crypto_key& key() const { return key_; }
     inline void set_key(const crypto_key& key) { key_ = key; }
-    [[deprecated]] inline void set_key(const uuid::uuid& key) { set_key(crypto_key(key.data())); }
     void set_key(const std::string_view& key);
 
     inline const random_uint8_generator& random_number_generator() const { return random_number_generator_; }

@@ -12,7 +12,7 @@ using Time_point = std::chrono::time_point<Clock>;
 
 int main()
 {
-    uuid::uuid key("37c525c7-08f6-4cd1-8aff-ea3e38eaec87");
+    cryp::symcrypt::crypto_key key{ 55, 197, 37, 199, 8, 246, 76, 209, 138, 255, 234, 62, 56, 234, 236, 135 };
     cryp::symcrypt symcrypt(key);
     std::vector<uint8_t> data;
     std::size_t data_size = 1024 * 1024 * 1024; // 1Gb
