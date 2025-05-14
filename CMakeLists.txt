@@ -17,7 +17,7 @@ set_build_type_ifndef()
 
 # C++ PROJECT
 
-set_project_name(NAMESPACE "arba" BASE_NAME "cryp")
+set_project_name(NAMESPACE "arba" FEATURE_NAME "cryp")
 string(TIMESTAMP configure_datetime "%Y%m%d-%H%M%S")
 set_project_semantic_version("0.5.0" PRE_RELEASE "dev" BUILD_METADATA "${configure_datetime}")
 
@@ -40,8 +40,8 @@ else()
 endif()
 configure_headers(configured_headers
     FILES
-        include/${PROJECT_NAMESPACE}/${PROJECT_BASE_NAME}/version.hpp.in
-        include/${PROJECT_NAMESPACE}/${PROJECT_BASE_NAME}/config.hpp.in
+        include/${PROJECT_NAMESPACE}/${PROJECT_FEATURE_NAME}/version.hpp.in
+        include/${PROJECT_NAMESPACE}/${PROJECT_FEATURE_NAME}/config.hpp.in
 )
 
 ## Headers:
@@ -55,6 +55,8 @@ set(sources
 )
 
 ## Add C++ library:
+cxx_standard_option(${PROJECT_UPPER_VAR_NAME}_CXX_STANDARD MIN 20 MAX 26)
+
 shared_or_static_option(${PROJECT_UPPER_VAR_NAME}_LIBRARY_TYPE "SHARED")
 if("${${PROJECT_UPPER_VAR_NAME}_LIBRARY_TYPE}" STREQUAL "SHARED")
   set(LIBRARY_TYPE_POSTFIX "")
@@ -67,10 +69,11 @@ endif()
 add_cpp_library(${PROJECT_TARGET_NAME} ${${PROJECT_UPPER_VAR_NAME}_LIBRARY_TYPE}
   HEADERS ${headers} ${configured_headers}
   SOURCES ${sources}
-  CXX_STANDARD 20
+  CXX_STANDARD ${${PROJECT_UPPER_VAR_NAME}_CXX_STANDARD}
   DEFAULT_WARNING_OPTIONS
+  DEFAULT_ERROR_OPTIONS
 )
-add_library("${PROJECT_NAMESPACE}::${PROJECT_BASE_NAME}${LIBRARY_TYPE_POSTFIX}" ALIAS ${PROJECT_TARGET_NAME})
+add_library("${PROJECT_NAMESPACE}::${PROJECT_FEATURE_NAME}${LIBRARY_TYPE_POSTFIX}" ALIAS ${PROJECT_TARGET_NAME})
 
 if(${${PROJECT_UPPER_VAR_NAME}_PARALLEL_EXECUTION})
     target_compile_definitions(${PROJECT_TARGET_NAME} PRIVATE -D${PROJECT_UPPER_VAR_NAME}_PARALLEL_EXECUTION_IS_AVAILABLE=1)
